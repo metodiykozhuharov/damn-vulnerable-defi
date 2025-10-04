@@ -3,6 +3,7 @@
 ## ✅ Solved Challenges
 
 - Unstoppable
+- Naive Receiver
 - Side Entrance
 
 ## About
