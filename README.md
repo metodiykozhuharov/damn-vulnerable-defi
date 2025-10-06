@@ -4,6 +4,7 @@
 
 - Unstoppable
 - Naive Receiver
+- Truster
 - Side Entrance
 
 ## About
