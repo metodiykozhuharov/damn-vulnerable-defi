@@ -6,6 +6,7 @@
 - Naive Receiver
 - Truster
 - Side Entrance
+- The Rewarder
 
 ## About
 
