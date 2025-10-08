@@ -159,16 +159,22 @@ contract TheRewarderChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      *
-     * The vulnerability is in how the distributor handles batched claims inside claimRewards().
-     * When multiple Claim items for the same merkle leaf (same token/amount/proof)
-     * are submitted in one transaction, the contract only marks
-     * the leaf as claimed after processing the batch (or after the final claim).
-     * Because the “claimed” flag is updated too late, an attacker can include
-     * the same valid proof multiple times within the same call:
-     * each duplicate passes verification and receives a payout before
-     * the contract records that the leaf has been consumed.
-     * This allows repeated withdrawals using the same proof in one transaction,
-     * draining the distributor’s token balance.
+     * The vulnerability lies in how the distributor handles batched claims inside `claimRewards()`.
+     * When multiple Claim items for the same valid Merkle leaf (same token, amount, and proof)
+     * are submitted within a single transaction, the contract only marks the claims as "claimed"
+     * after processing the entire batch (or after the final claim in the loop).
+     *
+     * Because the claimed bitmap is updated too late, each duplicate claim within the same call
+     * passes Merkle verification and triggers a token transfer before the contract records that
+     * the leaf has been consumed. This allows reusing the same valid proof multiple times in a
+     * single transaction to drain all of the distributor’s token balance.
+     *
+     * Additionally, the contract’s bitmap logic (tracking claimed batches per user and token)
+     * only sets bits for each `batchNumber`. If multiple claims reuse the same batch number
+     * (e.g. >256 claims all with `batchNumber = 0`), they all map to the same bit position,
+     * causing overlapping state or reverts. While this doesn’t directly cause the exploit,
+     * it highlights that the bitmap design can fail to safely handle large or duplicate
+     * batch sets, potentially leading to incorrect "AlreadyClaimed" reverts or inconsistent state.
      */
     function test_theRewarder() public checkSolvedByPlayer {
         // PLayer's address is 0x44E97aF4418b7a17AABD8090bEA0A471a366305C
